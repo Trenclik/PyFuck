@@ -1,4 +1,4 @@
-import string, sys, os, contextlib
+import string, sys, contextlib
 
 class PyFuckInterpreter:
     def __init__(self):
@@ -36,7 +36,12 @@ class PyFuckInterpreter:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             
-
+    def version():
+        try:
+            with open("VERSION", "r") as ver:
+                print("Current version: "+ver)
+        except Exception as ex:
+            print(ex + "Program might be demaged.\nPlease reinstall.")
     def display_help(self, commands:list=[]):
         self.debug("dislplay_help commands: "+str(commands))
         if len(commands) > 0:
