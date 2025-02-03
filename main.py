@@ -30,13 +30,14 @@ class PyFuckInterpreter:
                 if sys.argv[1] in ("compile", "c"):
                     try:self.compile_file(sys.argv[2])
                     except:print("No command option provided. Use command [help] for usage information.")
-                
+                if sys.argv[1] in ("version", "v"):
+                    self.version()
             else:
                 print("No command or file path provided. Use command [help] for usage information.")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             
-    def version():
+    def version(self):
         try:
             with open("VERSION", "r") as ver:
                 print("Current version: "+ver)
@@ -59,6 +60,10 @@ class PyFuckInterpreter:
     
     --debug,  -d     enables debug output
     --silent, -s    disables terminal output
+    """)
+                if command in ("version", "v"):
+                    print(f"""\nDisplays current vesion.
+    Usage: \"pyfuck version\"
     """)
         else:
             print(f"""\nHelp for PyFuck interpreter.
