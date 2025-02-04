@@ -40,7 +40,7 @@ class PyFuckInterpreter:
     def version(self):
         try:
             with open("VERSION", "r") as ver:
-                print("Current version: "+ver)
+                print("Current version: ",ver.read())
         except Exception as ex:
             print(ex + "Program might be demaged.\nPlease reinstall.")
     def display_help(self, commands:list=[]):
