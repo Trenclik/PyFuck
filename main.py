@@ -17,7 +17,7 @@ class PyFuckInterpreter:
         try:
             if len(sys.argv) > 1:
                 if sys.argv[1].endswith(".pyf"):
-                    self.display_help(sys.argv[2])
+                    self.decode_file("",sys.argv[1])
                 if sys.argv[1] in ("help", "h"):
                     try:self.display_help([x for x in sys.argv[2:None] if not x.startswith(("--", "-"))])
                     except:self.display_help()
@@ -33,11 +33,14 @@ class PyFuckInterpreter:
                 if sys.argv[1] in ("version", "v"):
                     self.version()
                 if sys.argv[1] in ("update", "u"):
-                    self.check_for_updates(sys.argv[2])
+                    try:
+                        self.check_for_updates(sys.argv[2])
+                    except IndexError:
+                        self.check_for_updates()
             else:
                 print("No command or file path provided. Use command [help] for usage information.")
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+            print(f"inputAn unexpected error occurred: {e}")
             
     def version(self):
         try:
@@ -86,6 +89,8 @@ class PyFuckInterpreter:
     help, h       display this help message
     run, r        run a .pyf file with the interpreter
     compile, c    compile Python to PyFuck
+    update, u     check for updates
+    version, v    display installed version
     """)
     def check_for_updates(self, options=[]):
         updater = Updater()

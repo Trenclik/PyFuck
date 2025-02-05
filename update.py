@@ -19,9 +19,9 @@ class Updater:
 
     def load_local_version(self):
         """Loads the local version from the VERSION file."""
-        version_path = self.get_path("VERSION")
+        self.version_path = self.get_path("VERSION")
         try:
-            with open(version_path, "r") as ver_file:
+            with open(self.version_path, "r") as ver_file:
                 return ver_file.read().strip()
         except FileNotFoundError:
             logging.error("VERSION file not found!")
