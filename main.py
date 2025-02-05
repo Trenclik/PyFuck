@@ -33,14 +33,12 @@ class PyFuckInterpreter:
                 if sys.argv[1] in ("version", "v"):
                     self.version()
                 if sys.argv[1] in ("update", "u"):
-                    try:
-                        self.check_for_updates(sys.argv[2])
-                    except IndexError:
-                        self.check_for_updates()
+                    try:self.check_for_updates(sys.argv[2])
+                    except IndexError:self.check_for_updates()
             else:
                 print("No command or file path provided. Use command [help] for usage information.")
         except Exception as e:
-            print(f"inputAn unexpected error occurred: {e}")
+            print(f"An unexpected error occurred: {e}")
             
     def version(self):
         try:
@@ -113,8 +111,6 @@ class PyFuckInterpreter:
         if [x for x in options[0:None] if x in (("--noconfirm", "-nc"))]:
             updater.download_package(assets)
             return
-        else:
-            raise Exception("An unexpected error has occured.")
             
     def decode_file(self, options=[], file_path=None):
         exstr = ""
