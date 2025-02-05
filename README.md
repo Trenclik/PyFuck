@@ -10,6 +10,9 @@ PyFuck is a minimalist esoteric programming language interpreter inspired by Bra
 - Command-line interface with multiple options
 
 ## Installation
+If the executable in releases doesn't work you can still use the runtime as a normal python script.
+
+### Remember to add pyfuck.exe to PATH before trying to run it.
 
 Ensure you have Python installed on your system. Then, clone the repository:
 
@@ -26,15 +29,22 @@ set PATH=%PATH%;%CD%
 
 ## Usage
 
+All commands have a shortenned version
+e.g.
+
+```sh
+pyfuck run -> pyfuck r
+```
+
 ### Running a PyFuck Script
 
-To execute a `.pyf` script, run:
+To execute a `.pyf` script open it with pyfuck.exe or run:
 
 ```sh
 pyfuck run <path_to_file>
 ```
 
-Use `--debug` to enable debugging output:
+Use `--debug` to enable debugging output (useless outside of developement):
 
 ```sh
 pyfuck run --debug <path_to_file>
@@ -66,6 +76,14 @@ To check the current installed version:
 
 ```sh
 pyfuck version
+```
+
+### Update
+
+To update pyfuck run this command:
+
+```sh
+pyfuck update
 ```
 
 ## PyFuck Language
