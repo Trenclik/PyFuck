@@ -14,11 +14,18 @@ If the executable in releases doesn't work you can still use the runtime as a no
 
 ### Remember to add pyfuck.exe to PATH before trying to run it.
 
-Ensure you have Python installed on your system. Then, clone the repository:
+Ensure you have Python installed and added to PATH. Then, clone the repository:
 
 ```sh
 git clone https://github.com/Trenclik/PyFuck.git
 cd PyFuck
+```
+
+Then run it with:
+
+```sh
+python main.py
+# main.py replaces pyfuck
 ```
 
 ## Usage
