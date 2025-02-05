@@ -1,5 +1,5 @@
 import string, sys, contextlib
-
+from update import *
 class PyFuckInterpreter:
     def __init__(self):
         self.vyber = 0
@@ -112,4 +112,6 @@ class PyFuckInterpreter:
         pass
 
 if __name__ == "__main__":
+    updater = Updater()
+    updater.downloadPackage(updater.checkRemoteVersion())
     PyFuckInterpreter().options()
