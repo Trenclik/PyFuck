@@ -32,6 +32,8 @@ class PyFuckInterpreter:
                     except:print("No command option provided. Use command [help] for usage information.")
                 if sys.argv[1] in ("version", "v"):
                     self.version()
+                if sys.argv[1] in ("update", "u"):
+                    self.check_for_updates(sys.argv[2])
             else:
                 print("No command or file path provided. Use command [help] for usage information.")
         except Exception as e:
@@ -48,9 +50,18 @@ class PyFuckInterpreter:
         if len(commands) > 0:
             for command in commands:
                 self.debug("command: "+str(command))
-                if command in ("help","h"):
+                if command in ("help", "h"):
                     print(f"""\nDisplays help for PyFuck interpreter and its commands.
     Usage: \"pyfuck help [command,...]\"
+    """)
+                if command in ("update", "u"):
+                    print(f"""\nChecks for updates.
+    Usage: \"pyfuck update --options
+    
+    Oprions:
+    
+    --noconfirm, -nc automaticly confirms update download
+    --silent, -s     disables terminal output
     """)
                 if command in ("run", "r"):
                     print(f"""\nExecutes a PyFuck file. 
@@ -58,7 +69,6 @@ class PyFuckInterpreter:
     
     Options:
     
-    --debug,  -d     enables debug output
     --silent, -s    disables terminal output
     """)
                 if command in ("version", "v"):
@@ -83,16 +93,23 @@ class PyFuckInterpreter:
         if len(options) == 0 and not is_latest_version:
             confirmation = input("Do you want to download the newest version? [Y/n]: ")
             if confirmation.lower() == "y" or confirmation == "":
-                updater.download_package(assets)
-                return
+                if [x for x in options[0:None] if x in (("--silent", "-s"))]:
+                    with contextlib.redirect_stdout(None):
+                        updater.download_package(assets)
+                        return
+                else:
+                    updater.download_package(assets)
+                    return
             if confirmation.lower() == "n":
                     logging.info("Skipping download: User aborted the operation.")
                     return
             else:
                 logging.warning("Skipping download: Invalid option")
-        if options in ("-nc", "--noconfirm"):
+        if [x for x in options[0:None] if x in (("--noconfirm", "-nc"))]:
             updater.download_package(assets)
             return
+        else:
+            raise Exception("An unexpected error has occured.")
             
     def decode_file(self, options=[], file_path=None):
         exstr = ""
