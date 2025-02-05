@@ -1,41 +1,79 @@
 import requests
+import os
+import sys
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 class Updater:
-    def __init__(self):
-        self.REPO = "Trenclik/PyFuck"
-        self.API_URL = f"https://api.github.com/repos/{self.REPO}/releases/latest"
-        self.HEADERS = {
-            "Accept":"application/vnd.github.v3+json",
-            #"Authorization":""
-        }
-        self.update()
-    def update(self):
-        with open("API_KEY", "r") as api:
-            self.HEADERS["Authorization"] = api.read()
-        with open("VERSION", "r") as ver:
-            self.VERSION = ver.read()
-    def checkRemoteVersion(self):
-        response = requests.get(self.API_URL, headers=self.HEADERS)
-        response.raise_for_status()
-        release_data = response.json()
-        ver = release_data.get("tag_name")
-        assets = release_data.get("assets", [])
-        if ver == self.VERSION:
-            return True
-        elif not assets:
-            raise ValueError("No assets found in the latest release.")
-        return assets
-    def downloadPackage(self, assets):
+    def __init__(self, repo="Trenclik/PyFuck"):
+        self.api_url = f"https://api.github.com/repos/{repo}/releases/latest"
+        self.headers = {"Accept": "application/vnd.github.v3+json"}
+        self.local_version = self.load_local_version()
+
+    def get_path(self, filename):
+        """Gets the absolute path of a file, handling PyInstaller bundles."""
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(__file__))
+        return os.path.join(base_path, filename)
+
+    def load_local_version(self):
+        """Loads the local version from the VERSION file."""
+        version_path = self.get_path("VERSION")
         try:
-            if assets == True:
-                print("bruh")
+            with open(version_path, "r") as ver_file:
+                return ver_file.read().strip()
+        except FileNotFoundError:
+            logging.error("VERSION file not found!")
+            return None
+
+    def check_remote_version(self):
+        """Checks the latest version on GitHub and returns the asset dictionary if an update is needed."""
+        try:
+            response = requests.get(self.api_url, headers=self.headers)
+            if response.status_code == 403:
+                logging.error("GitHub API rate limit exceeded. Consider setting an API key.")
+                return None, False
+            response.raise_for_status()
+
+            release_data = response.json()
+            remote_version = release_data.get("tag_name")
+            assets = release_data.get("assets", {})
+
+            if not assets:
+                logging.warning("No assets found in the latest release.")
+                return None, False
+
+            if remote_version == self.local_version:
+                logging.info("Already up-to-date.")
+                return assets, True
+
+            logging.info(f"New version available: {remote_version}")
+            return assets, False
+
+        except requests.RequestException as e:
+            logging.error(f"Failed to check remote version: {e}")
+            return None, False
+
+    def download_package(self, assets):
+        """Downloads the latest release package if an update is needed."""
+        try:
+            download_url = assets.get("browser_download_url")
+            filename = assets.get("name")
+
+            if not download_url or not filename:
+                logging.warning(f"Skipping download: Missing URL or filename in assets dictionary.")
                 return
-        except ValueError as err:
-            print(err)
-        except:
-            download_url = assets["browser_download_url"]
-            asset_response = requests.get(download_url, stream=True)
-            asset_response.raise_for_status()
-            filename = assets["name"]
+
+            logging.info(f"Downloading {filename}...")
+
+            response = requests.get(download_url, stream=True)
+            response.raise_for_status()
+
             with open(filename, "wb") as file:
-                for chunk in asset_response.iter_content(chunk_size=8192):
+                for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
+                    logging.info(f"Downloaded {filename} successfully.")
+
+        except requests.RequestException as e:
+            logging.error(f"Download failed: {e}")

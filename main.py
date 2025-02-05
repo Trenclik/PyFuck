@@ -39,7 +39,7 @@ class PyFuckInterpreter:
             
     def version(self):
         try:
-            with open("VERSION", "r") as ver:
+            with open(Updater().version_path, "r") as ver:
                 print("Current version: ",ver.read())
         except Exception as ex:
             print(ex + "Program might be demaged.\nPlease reinstall.")
@@ -77,7 +77,23 @@ class PyFuckInterpreter:
     run, r        run a .pyf file with the interpreter
     compile, c    compile Python to PyFuck
     """)
-
+    def check_for_updates(self, options=[]):
+        updater = Updater()
+        assets, is_latest_version = updater.check_remote_version()
+        if len(options) == 0 and not is_latest_version:
+            confirmation = input("Do you want to download the newest version? [Y/n]: ")
+            if confirmation.lower() == "y" or confirmation == "":
+                updater.download_package(assets)
+                return
+            if confirmation.lower() == "n":
+                    logging.info("Skipping download: User aborted the operation.")
+                    return
+            else:
+                logging.warning("Skipping download: Invalid option")
+        if options in ("-nc", "--noconfirm"):
+            updater.download_package(assets)
+            return
+            
     def decode_file(self, options=[], file_path=None):
         exstr = ""
         self.debug("decode_file options:"+str(options))
@@ -112,6 +128,4 @@ class PyFuckInterpreter:
         pass
 
 if __name__ == "__main__":
-    updater = Updater()
-    updater.downloadPackage(updater.checkRemoteVersion())
     PyFuckInterpreter().options()
