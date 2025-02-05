@@ -21,12 +21,6 @@ git clone https://github.com/Trenclik/PyFuck.git
 cd PyFuck
 ```
 
-To be able to run the program anywhere you need to add it to path:
-
-```sh
-set PATH=%PATH%;%CD%
-```
-
 ## Usage
 
 All commands have a shortenned version
