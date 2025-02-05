@@ -1,6 +1,6 @@
 # PyFuck
 
-PyFuck is a minimalist esoteric programming language interpreter inspired by Brainfuck. It provides a simple interpreter for executing PyFuck scripts and includes an automatic updater.
+PyFuck is a minimalist esoteric programming language interpreter inspired by Brainfuck. It provides a simple interpreter for executing PyFuck scripts and includes an updater.
 
 ## Features
 
@@ -80,7 +80,7 @@ pyfuck version
 
 ### Update
 
-To update pyfuck run this command:
+To update pyfuck interpreter:
 
 ```sh
 pyfuck update
@@ -122,7 +122,7 @@ Example PyFuck script that executes `print("Hello World!")`:
 
 ## Automatic Updater
 
-The interpreter includes an automatic updater that checks the latest version from GitHub releases.
+The interpreter includes an updater that checks the latest version from GitHub releases.
 
 ## Contributing
 
