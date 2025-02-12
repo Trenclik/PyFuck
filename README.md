@@ -10,8 +10,7 @@ PyFuck is a minimalist esoteric programming language interpreter inspired by Bra
 - Command-line interface with multiple options
 
 ## Installation
-
-If the executable in releases doesn't work you can still use the runtime as a normal python script.
+If the executable in releases doesn't work you can still use the interpreter as a normal python script.
 
 ### Remember to add pyfuck.exe to PATH before trying to run it.
 
