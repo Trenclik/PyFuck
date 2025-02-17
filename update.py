@@ -30,16 +30,15 @@ class Updater:
     def check_remote_version(self):
         """Checks the latest version on GitHub and returns the asset dictionary if an update is needed."""
         try:
-            response = requests.get(self.api_url, headers=self.headers)
+            response = requests.get(self.api_url, headers=self.headers) # prvotní check remote serveru
             if response.status_code == 403:
                 logging.error("GitHub API rate limit exceeded. Consider setting an API key.")
                 return None, False
             response.raise_for_status()
 
             release_data = response.json()
-            remote_version = release_data.get("tag_name")
-            assets = release_data.get("assets", {})
-
+            remote_version = release_data.get("tag_name") # tag jako na githubu verze v tagu jako vole tag na GH jako verze
+            assets = release_data.get("assets", {})[0]
             if not assets:
                 logging.warning("No assets found in the latest release.")
                 return None, False
@@ -73,7 +72,7 @@ class Updater:
             with open(filename, "wb") as file:
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
-                    logging.info(f"Downloaded {filename} successfully.")
+                logging.info(f"Downloaded {filename} successfully.")
 
         except requests.RequestException as e:
             logging.error(f"Download failed: {e}")
