@@ -5,11 +5,22 @@ PyFuck is a minimalist esoteric programming language interpreter inspired by Bra
 ## Features
 
 - Interpret and execute `.pyf` PyFuck files
+- Compile valid python code into PyFuck files
 - Debugging options for easier troubleshooting
 - Automatic updates via GitHub API
 - Command-line interface with multiple options
 
+## Uses
+
+- None that matter
+- Maybe obfuscation
+
 ## Installation
+
+### Windows
+
+Go to the [releases page](https://github.com/Trenclik/PyFuck/releases) and download the latest executable.
+Then [add the executable to PATH](https://gist.github.com/ScribbleGhost/752ec213b57eef5f232053e04f9d0d54)
 
 If the executable in releases doesn't work you can still use the interpreter as a normal python script.
 __Remember to add pyfuck.exe to PATH before trying to run it!__
@@ -61,13 +72,7 @@ pyfuck run --silent <path_to_file>
 To see available commands and options:
 
 ```sh
-pyfuck help
-```
-
-For detailed help on a specific command:
-
-```sh
-pyfuck help run
+pyfuck --help
 ```
 
 ### Check Version
@@ -134,4 +139,4 @@ This project is licensed under the MIT License.
 
 ## Disclaimer
 
-This is an experimental project and may contain bugs. Use at your own risk.
+This is an experimental project and may contain bugs. If you intend to use this project anywhere important, please don't.
