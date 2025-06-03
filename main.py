@@ -16,7 +16,8 @@ class PyFuckInterpreter:
     def __init__(self):
         self.pointer = 0
         self.chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ', '\t', '\n', '\r', '\x0b', '\x0c']
-    
+        self.filename = ""
+        
     def execute(self, code: str, silent: bool = False):
         """
         Executes PyFuck code.
@@ -38,6 +39,7 @@ class PyFuckInterpreter:
         found_imports = import_pattern.findall(output)
         exec_env = { # type: ignore
             '__builtins__': __builtins__,
+            '__file__': self.filename,
             '__name__':'__main__'
         }
         for imp in found_imports:
@@ -51,23 +53,23 @@ class PyFuckInterpreter:
         except Exception as e:
             print(f"Error during execution: {e}")
 
-    def run_file(self, file_path: str, silent: bool = False) -> None:
+    def run_file(self, silent: bool = False) -> None:
         """
         Reads and executes a .pyf file.
 
         :param file_path: Path to the file.
         :param silent: If True, suppresses output.
         """
-        if not file_path.endswith(".pyf"):
+        if not self.filename.endswith(".pyf"):
             logging.error("File is not a valid PyFuck script!")
             return
         
         try:
-            with open(file_path, "r") as file:
+            with open(self.filename, "r") as file:
                 self.execute(file.read(), silent)
                 return
         except FileNotFoundError:
-            logging.error(f"File not found: {file_path}")
+            logging.error(f"File not found: {self.filename}")
             return
         except KeyboardInterrupt:
             logging.info("Execution interrupted by user.")
@@ -342,7 +344,8 @@ def main():
         if args.file:
             if not args.file.endswith(".pyf"):
                 logging.warning("Provided file is not a PyFuck script! Attempting to run in plaintext mode.")
-            interpreter.run_file(args.file, args.silent)
+            interpreter.filename = args.file
+            interpreter.run_file(args.silent)
         else:
             logging.error("No file specified for execution.")
 
