@@ -74,7 +74,6 @@ class PyFuckInterpreter:
         except KeyboardInterrupt:
             logging.info("Execution interrupted by user.")
             return
-
 class Updater:
     """
     Handles checking for updates and downloading new versions.
@@ -168,9 +167,13 @@ class Compiler:
         self.chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ', '\t', '\n', '\r', '\x0b', '\x0c']
         self.is_verbose = False
         self.is_silent = False
+        self.format = False
         pass
 
     def main(self, filename: str) -> None:
+        if not filename.endswith(".py"):
+            logging.error("Input file is not a python script!")
+            return
         with open(filename,"r") as source_file:
             object_list: list[list[int]] = self.disassemble(source_file.read())
             instruction_list: list[tuple[int,int]] = self.link(object_list)
@@ -237,14 +240,13 @@ class Compiler:
         if not self.is_silent: 
             logging.info("Code disassembled successfully!")
         return lines
-
     def link(self, line_object: list[list[int]]) -> list[tuple[int,int]]:
         """
         Translates object lists into 1 instruction list
         """
         instructions: list[tuple[int,int]] = []
         previous_idx: int = 0
-        if self.is_verbose: logging.info(f"Object linking started")
+        if not self.is_silent: logging.info(f"Object linking started")
         for idx, line in enumerate(line_object):
             if self.is_verbose: logging.info(f"Opening new line")
             result:tuple[int,int]
@@ -279,30 +281,35 @@ class Compiler:
             previous_idx = 96
             if self.is_verbose: logging.info(f"Adding newline symbol")
             instructions.append((opt,mult))
-        if self.is_verbose: logging.info(f"Object linking finished")
+        if not self.is_silent: logging.info(f"Object linking finished")
         return instructions
 
     def assemble(self, instructions: list[tuple[int,int]]) -> str:
         """
         Assembles code from instructions
         """
+        if not self.is_silent: logging.info(f"Code assembly started")
         code = ""
         previous_inst = ()
         for idx, instruction in enumerate(instructions):
             if self.is_verbose: logging.info(f"Decoding instruction {str(instruction)} No.{idx} of {str(len(instructions) - 1)}")
             if instruction[0] == 0:
                 code += "!"
+                if self.format: code += "\n"
             if instruction[0] == 1:
-                for mult in range(instruction[1]):
+                for i in range(instruction[1]):
                     code += "<"
                 code += "!"
+                if self.format: code += "\n"
             if instruction[0] == 2:
-                for mult in range(instruction[1]):
+                for i in range(instruction[1]):
                     code += ">"
                 code += "!"
+                if self.format: code += "\n"
             if self.is_verbose: logging.info(f"Assigning previous_inst {previous_inst} -> {instruction}")
             previous_inst = instruction
             if self.is_verbose: logging.info(f"Decoding complete!")
+        if not self.is_silent: logging.info(f"Code assembly finished")
         return code
 
     def write(self, code: str, filename: str) -> None:
@@ -315,37 +322,56 @@ class Compiler:
         
 def main():
     parser = argparse.ArgumentParser(description="PyFuck Interpreter CLI")
+    parser.add_argument("--log", "-l", help="prints logging output to <file>.log", action="store_true")
     subparsers = parser.add_subparsers(dest="command", required=True, help="Available commands")
 
     # Run command
     run_parser = subparsers.add_parser("run", aliases=["r"], help="Run a PyFuck script")
     run_parser.add_argument("file", help="File to execute (.pyf script)")
     run_parser.add_argument("--silent", "-s", action="store_true", help="Suppress output")
+    run_parser.add_argument("--log", "-l", help="prints logging output to <file>.log", action="store_true")
 
     # Update command
     update_parser = subparsers.add_parser("update", aliases=["u"], help="Check for updates and download new version")
     update_parser.add_argument("--noconfirm", "-nc", action="store_true", help="Auto-confirm updates")
+    update_parser.add_argument("--log", "-l", help="prints logging output to <file>.log", action="store_true")
 
     # Version command
     subparsers.add_parser("version", aliases=["v"], help="Show the current version")
 
-    # Compile command (not implemented yet)
+    # Compile command
     compile_parser = subparsers.add_parser("compile", aliases=["c"], help="Compile PyFuck to an executable (Not implemented yet)")
     compile_parser.add_argument("file", help="File to compile (.pyf script)")
-    compile_parser.add_argument("--verbose", action="store_true", help="More verbose output")
-    compile_parser.add_argument("--silent", action="store_true", help="Suppress output")
+    compile_parser.add_argument("--verbose", "-v", action="store_true", help="More verbose output")
+    compile_parser.add_argument("--silent", "-s", action="store_true", help="Suppress output")
+    compile_parser.add_argument("--format", "-f", action="store_true", help="output is formatted for better readibility (as much as possible)")
+    compile_parser.add_argument("--log", "-l", help="prints logging output to <file>.log", action="store_true")
 
     args = parser.parse_args()
-
+    if args.log:
+        # Get the log filename based on the command
+        log_filename = f"{args.command}.log" if hasattr(args, 'command') else "pyfuck.log"
+        
+        # Configure logging to both file and console
+        logging.basicConfig(
+            level=logging.INFO,
+            filemode="a",
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            handlers=[
+                logging.FileHandler(log_filename),
+                logging.StreamHandler()
+            ]
+        )
     interpreter = PyFuckInterpreter()
     updater = Updater()
     compiler = Compiler()
     if args.command in ("run", "r"):
         if args.file:
             if not args.file.endswith(".pyf"):
-                logging.warning("Provided file is not a PyFuck script! Attempting to run in plaintext mode.")
-            interpreter.filename = args.file
-            interpreter.run_file(args.silent)
+                logging.error("Provided file is not a PyFuck script!")
+            else:
+                interpreter.filename = args.file
+                interpreter.run_file(args.silent)
         else:
             logging.error("No file specified for execution.")
 
@@ -365,11 +391,13 @@ def main():
             compiler.is_verbose = True
         if args.silent:
             compiler.is_silent = True
+        if args.format:
+            compiler.format = True
         if args.silent and args.verbose:
             logging.error("Compiler can be only verbose or silent. Not both!")
             return
+        logging.warning("Compiler is still not finished. If you encounter errors please refer to the docs.")
         compiler.main(args.file)
-        #logging.info("This feature is not implemented yet.")
 
 if __name__ == "__main__":
     main()
