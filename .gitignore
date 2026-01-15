@@ -1,1 +1,8 @@
-__pycache__/
+/bin
+/include
+/lib
+/lib64
+*.cfg
+*.log
+*.pyf
+/__pycache__
