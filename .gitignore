@@ -5,3 +5,5 @@
 /lib64
 *.cfg
 *.log
+*.pyf
+/__pycache__
